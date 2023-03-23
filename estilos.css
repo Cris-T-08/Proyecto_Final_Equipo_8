@@ -1,0 +1,14 @@
+body {
+  background-color: #f3f3f3; /* Establece el color de fondo del body (página) como gris claro */
+}
+
+#chart-container { /*El contenedor genérico chart-container se define con un ancho de 800 píxeles, una altura de 500 píxlees y un margen automático */
+width: 800px;
+height: 500px;
+margin: 0 auto;
+}
+
+#mi-grafico-ramon-cris-proyecto { /*Establece el ancho y alto del elemento con id mi-grafico-ramon-cris-proyecto (o sea, del canvas): 100% de ancho y alto re*/
+width: 100%;
+height: 100%;
+}

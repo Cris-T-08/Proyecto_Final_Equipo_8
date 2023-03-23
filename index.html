@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gráficos basados en Global Terrorism Database - Proyecto Final Ramón & Cristina</title>
+  <link href="estilos.css" rel="stylesheet" type="text/css"> <!--Enlaza el archivo estilos.css a la página HTML-->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.3.4/axios.min.js"></script> <!--Link obtenido de https://cdnjs.com/libraries/axios-->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.2.1/dist/chart.umd.js"></script>  <!--Link obtenido de https://cdnjs.com/libraries/Chart.js-->
+  <meta charset="UTF-8"> <!--Etiqueta HTML que define la codificación de caracteres utilizada en la página web; en este caso, ISO-8859-1. En nuestras pruebas ocurría que si no se añadía codificación la página se volvía, incluso, infuncional-->
+</head>
+<body>
+  <div id="chart-container"> <!--Crea un contenedor genérico, cuyo atributo id tiene como valor chart-container-->
+    <canvas id="mi-grafico-ramon-cris-proyecto"></canvas> <!--La etiqueta canvas se utiliza en HTML para dibujar gráficos, imágenes y otros elementos visuales mediante JavaScript-->
+  </div>
+<form method="GET" action="grafico.php"> <!--La etiqueta form en HTML se utiliza pra crear un formulario web. Los atributos method y form especifican cómo y dónde se enviará la información. Se escoge el atributo de method GET porque el formulario no contiene información confidencial y se puede compartir sin problemas por URL. Con action se indica que los datos del formulario se envían a grafico.php-->
+  <label for="dato1">Año:</label> 
+  <select id="dato1" name="año"> <!--Primer elemento de selección: permite al usuario elegir un año-->
+    <option value="2021">2021</option>
+  </select>
+  <label for="dato2">Región:</label>
+  <select id="dato2" name="region"> <!--Segundo elemento de selección: permite al usuario elegir una región-->
+    <option value="Todas">Todas</option>
+    <option value="America del Norte">América del Norte</option>
+    <option value="America Central y Caribe">América Central y Caribe</option>
+    <option value="America del Sur">América del Sur</option>
+    <option value="Asia Oriental">Asia Oriental</option>
+    <option value="Asia Meridional">Asia Meridional</option>
+    <option value="Asia Central">Asia Central</option>
+    <option value="Europa Occidental">Europa Occidental</option>
+    <option value="Europa del Este">Europa del Este</option>
+    <option value="Oriente Medio y Norte de África">Oriente Medio y Norte de África</option>
+    <option value="África Subsahariana">África Subsahariana</option>
+    <option value="Australasia y Oceanía">Australasia y Oceanía</option>
+  </select>
+  <button type="submit">Actualizar</button> <!--En HTML, la etiqueta button se usa para crear un botón, y type indica su comportamiento, que en este caso es submit, lo que significa que cuando se clica en el botón, el agente de usuario (normalmente, el navegador web) activa el evento de envío del formulario, que es hacia grafico.php, como se determina con action="grafico.php"; además, interviene el controlador de eventos form.addEventListener("submit", function(event) {-->
+</form>
+
+<!--
+Seguidamente, se añade código JavaScript que maneja el envío del formulario, realiza una solicitud GET a grafico.php usando Axios y crea y actualiza el gráfico en la página web usando Chart.js
+Este código JavaScript se ejecuta cuando el navegador carga la página. Además, el archivo grafico.js incluye funciones que se usan para generar gráficos en la página web, accediendo a elementos HTML como canvas
+-->
+
+<script>
+  var form = document.querySelector("form"); // Selecciona el elemento del formulario en la página HTML y guarda una referencia en la variable form. Se utiliza el método querySelector del objeto document para seleccionar el elemento del formulario en la página HTML. En document.querySelector("form"), form es un argumento de la función querySelector utilizado como un selector de CSS. Luego, con var form = se guarda una referencia a este elemento en la variable form
+  // A continuación, se utiliza Axios para realizar una solicitud GET y obtener datos del archivo grafico.php:
+  form.addEventListener("submit", function(event) { // Es un controlador de eventos del formulario. Hace que el formulario, en lugar de que se envíe de la manera predeterminada y recargue la página, con event.preventDefault(); se cancela este comportamiento predeterminado
+    event.preventDefault(); // Evita que se envíe el formulario de forma predeterminada, evitando que la página se recargue
+    var año = document.getElementById("dato1").value; // Obtiene el valor del año seleccionado por el usuario (recuérdese que, en el formulario, dato1 hace referencia a año)
+    var region = document.getElementById("dato2").value; //Obtiene el valor de la region seleccionada por el usuario (recuérdese que, en el formulario, dato2 hace referencia a region)
+    axios.get("grafico.php?año=" + año + "&region=" + region) // Realiza una solicitud GET usando Axios, pasando los valores del año y la región como parámetros de la URL
+      .then(function(response) { // La función .then se ejecuta cuando la solicitud GET se completa con éxito. function recibe un objeto response que contiene la respuesta del servidor
+        var data = response.data; // Guarda los datos devueltos por el servidor en la variable data. Por su parte, response.data contiene la información en formato JSON que fue enviada por el archivo grafico.php
+		//A continuacion, aparece la parte del código que crea y actualiza el gráfico en la web utilizando Chart.js
+        var ctx = document.getElementById("mi-grafico-ramon-cris-proyecto").getContext("2d"); // Contexto de renderizado 2D del elemento canvas con ID mi-grafico-ramon-cris-proyecto
+        var miGrafico = new Chart(ctx, { // Creación de una nueva instancia del gráfico utilizando Chart.js, guardándose en la variable miGrafico. Se le pasa el renderizado ctx y un objeto de JavaScript (es decir, una colección de propiedades y métodos) que contiene la configuración del gráfico
+          type: 'bar', // Tipo de gráfico a crear; en este caso, de barras (bar)
+          data: { // Configuración del gráfico
+            labels: data.labels, // En el eje X (horizontal) del gráfico se define la etiqueta 'años' (es años porque en el PHP se establece $labels[] = strval($row['iano']);, lo que también se refleja en la información devuelta en JSON desde grafico.php: echo json_encode(['labels' => $labels, que se recoge en var data = response.data;
+            datasets: [{
+              label: data.label, // Referencia al número de víctimas mortales. En el JSON de grafico.php aparece: 'label' => 'Número de víctimas mortales'
+              data: data.data, // Datos para el eje Y (total_fallecidos). En grafico.php aparece $data[] = intval($row['total_fallecidos']); y en el JSON se define 'data' => $data
+              backgroundColor: 'rgba(255, 99, 132, 0.2)',
+              borderColor: 'rgba(255, 99, 132, 1)',
+              borderWidth: 1
+            }]
+          },
+          options: { // Opciones de configuración adicionales del gráfico
+            scales: {
+              yAxes: [{
+                ticks: {
+                  beginAtZero: true // Con esto se define que el eje Y debe comenzar en cero
+                }
+              }]
+            }
+          }
+        });
+      })
+      .catch(function(error) { // Controlador de errores por si ocurre algún error al realizar la solicitud al servidor o al procesar la respuesta...
+        console.log(error); // ... en caso de error, se mostrará en la consola del navegador con console.log
+      });
+  });
+</script> 
+  <script src="grafico.js"></script> <!--Con esto se carga el código de JavaScript de grafico.js en la página HTML-->
+</body>
+</html>
