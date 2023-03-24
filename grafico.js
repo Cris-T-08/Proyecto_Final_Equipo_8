@@ -1,3 +1,4 @@
+/*CÓDIGO DE PROYECTO versión 2 (V2). La V2 es igual que la V1, solo que grafico.php está segurizado frente a los ataques más comunes*/
 /*
 La función principal de grafico.js, que es un archivo JavaScript, es:
 
